@@ -142,7 +142,10 @@ COMMAND is input parameter."
 
 (defun sideline-eldoc--extract-message (str &rest args)
   "Extract eldoc message format STR with ARGS."
-  (setq sideline-eldoc--message (apply #'format str args)))
+  (if str
+      (setq sideline-eldoc--message (apply #'format str args))
+    nil)
+  )
 
 (if sideline-eldoc-hide-minibuffer
     (setq eldoc-message-function #'sideline-eldoc--extract-message)
