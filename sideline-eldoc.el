@@ -87,9 +87,8 @@ COMMAND is input parameter."
 
 (defun sideline-eldoc--display (callback &rest _)
   "Execute CALLBACK to display with sideline."
-  (when eldoc-mode
-    (when-let ((msg sideline-eldoc--message)
-               )
+  (when (and eldoc-mode (eq major-mode #'emacs-lisp-mode))
+    (when-let ((msg sideline-eldoc--message))
       (funcall callback (sideline-eldoc--combine-all-infomations)))))
 
 (defun sideline-eldoc--combine-all-infomations ()
