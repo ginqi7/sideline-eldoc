@@ -57,6 +57,7 @@
 (require 'sideline)
 
 (defvar sideline-eldoc--message "")
+(make-variable-buffer-local 'sideline-eldoc--message)
 
 (defgroup sideline-eldoc nil
   "Sideline backend for eldoc."
@@ -86,8 +87,10 @@ COMMAND is input parameter."
      (cons :async #'sideline-eldoc--display))))
 
 (defun sideline-eldoc--display (callback &rest _)
-  "Execute CALLBACK to display with sideline."
-  (when (and eldoc-mode (eq major-mode #'emacs-lisp-mode))
+  "Execute CALLBACK to display with sideline.
+
+Also display in minibuffer, causing cursor to extend very long("
+  (when eldoc-mode
     (when-let ((msg sideline-eldoc--message))
       (funcall callback (sideline-eldoc--combine-all-infomations)))))
 
@@ -109,7 +112,6 @@ COMMAND is input parameter."
     (when (member 'sideline-eldoc sideline-backends-left)
       sideline-order-left)))
 
-
 (defun sideline-eldoc--parse-function-demo (msg)
   "Eldoc sideline parse function demo by MSG."
   ;; TODO
@@ -129,7 +131,6 @@ COMMAND is input parameter."
     (if (>= (length doc-lines) sideline-eldoc-documentation-max-line)
         (seq-subseq doc-lines 0 sideline-eldoc-documentation-max-line))))
 
-
 (defun sideline-eldoc--fetch-function-documentation (msg)
   "Eldoc sideline parse function documentation by MSG."
   (let ((msg-no-properties (substring-no-properties msg)))
@@ -142,9 +143,8 @@ COMMAND is input parameter."
 (defun sideline-eldoc--extract-message (str &rest args)
   "Extract eldoc message format STR with ARGS."
   (if str
-      (setq sideline-eldoc--message (apply #'format str args))
-    nil)
-  )
+      (setq-local sideline-eldoc--message (apply #'format str args))
+    (setq-local sideline-eldoc--message nil)))
 
 (if sideline-eldoc-hide-minibuffer
     (setq eldoc-message-function #'sideline-eldoc--extract-message)
